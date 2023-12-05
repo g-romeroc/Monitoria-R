@@ -1,0 +1,184 @@
+---
+title: "Monitoria 3 - Gráficos e Regressão Linear Simples"
+author: "Gustavo Romero Cardoso e João Pedro Saldanha Corrêa"
+date: '2022-08-29'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+## **Parte 1** - Manipulação de bases 
+
+Contando observações em grupos
+```{r}
+data <- gss_cat
+
+# Solução 1
+data %>% count(partyid)
+
+# Solução 2
+data %>% group_by(partyid) %>% tally()
+```
+
+É possível combinar grupos e aplicar o `count()`. No exemplo abaixo, juntamos 3 tipos de respostas em apenas um grupo.
+
+```{r}
+gss_cat %>% mutate(partyid = fct_collapse(partyid, outros = c("No answer", "Don't know", "Other party"))) %>% count(partyid)
+
+```
+
+
+```{r}
+data %>% group_by(relig) %>% count()
+```
+
+```{r}
+
+gss_cat %>%
+ mutate(partyid = fct_collapse(partyid,
+  Outros = c("No answer", "Don't know", "Other party"))) %>% count(partyid)
+
+```
+
+
+
+
+
+```{r}
+data_1 <- gss_cat %>%
+ mutate(partyid = fct_collapse(partyid,
+  Outros = c("No answer", "Don't know", "Other party"),
+  Republicanos = c("Strong republican", "Not str republican"),
+  Indep = c("Ind,near rep","Independent", "Ind,near dem" ),
+  Democratas = c("Not str democrat", "Strong democrat"))) 
+data_1
+```
+```{r}
+data_1 %>% count(partyid)
+
+```
+
+
+```{r}
+data_1 %>% mutate( Partidos = case_when(data_1$partyid=="Outros" ~1, data_1$partyid=="Republicanos" ~ 2, data_1$partyid=="Indep" ~ 3, data_1$partyid=="Democratas"~4)) %>% select(partyid, Partidos)
+
+```
+
+
+## **Parte 2** - Gráficos
+
+
+
+### Histograma
+Vamos construir um histograma para a variável Assault, o número de prisões por assalto a cada 100.000 habitantes.
+
+```{r}
+data <- USArrests
+
+data %>% ggplot() + 
+  geom_histogram(aes(x = Assault),
+                 binwidth = 20,
+                 color = "blue",
+                 fill = "blue",
+                 alpha = 0.6) +
+  labs(x='Assaltos para cada 100 mil habitantes',
+       y = 'Frequência',
+       title='Assaltos em Estados Americanos',
+       subtitle = 'Subtítulo',
+       caption = 'Explicação do gráfico')
+```
+
+### Gráfico de Dispersão 
+
+Pode-se utilzar quando temos duas variáveis **quantitativas**. 
+```{r}
+data %>% ggplot() + geom_point(aes(x = Murder, y = UrbanPop )) +  geom_smooth(aes(x = Murder , y = UrbanPop), 
+ method = 'lm')
+```
+
+
+
+
+
+
+### Gráficos em barras
+
+```{r}
+
+data %>% mutate( Assaltos = case_when(Assault <=150 ~1, Assault>150 ~ 2)) %>% ggplot() + geom_bar(aes(x=Assaltos))
+
+
+```
+
+Para variáveis com mais de uma variação, o princípio é similar. Utilizando o exemplo dos Partidos que realizamos anteriorments:
+
+```{r}
+
+data_1 %>% mutate( Partidos = case_when(data_1$partyid=="Outros" ~1, data_1$partyid=="Republicanos" ~ 2, data_1$partyid=="Indep" ~ 3, data_1$partyid=="Democratas"~4)) %>% select(partyid, Partidos) %>% ggplot() + geom_bar (aes(x = factor(Partidos)), fill = rainbow(4)) + labs(x='Partidos')
+
+```
+
+
+## *Parte 3* - Regressão Linear
+
+$$ y = \beta_0 + \beta_1 x $$
+
+
+#### Modelo:
+$$ Assault = \beta_0 + \beta_1 UrbanPop$$
+```{r}
+# Opção 1 
+model1 <- lm(data$Assault ~ data$UrbanPop)
+
+# Opção 2
+model11 <- lm(data = data, Assault ~ UrbanPop)
+
+
+# Opção 3
+attach(data)
+
+model1 <- lm(Assault ~ UrbanPop)
+
+```
+
+
+#### Parâmetros e Informações do modelo
+
+```{r}
+model1
+
+coef(model1)
+
+summary(model1)
+
+## Gráfico de Dispersão + Reta da rehressão 
+plot(UrbanPop,Assault,type='p',xlab='UrbanPop',ylab='Assault',main='Regressão') + abline(model1, col='red', lwd=2)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
