@@ -1,0 +1,72 @@
+---
+title: "Exportando Resultados em Latex - Statgazer"
+author: "Gustavo Romero e João P. Corrêa"
+date: '2022-11-18'
+output: pdf_document
+---
+
+Importando as bibliotecas
+```{r}
+library(wooldridge)
+library(sandwich) 
+library(AER) # Para encontrar teste t / teste F - Ver o outro arquivo de apoio
+```
+
+Uma outra maneira de exportar os resultados é utilizando a biblioteca `stargazer()`.
+```{r}
+library(stargazer)
+```
+Vamos utilizar a base de dados `WAGE2`do wooldridge para esse exemplo.
+```{r}
+dados <- wooldridge::wage2
+```
+
+
+Considere a seguinte regressão:
+
+$$ log (wage) = \beta_0 + \beta_1 educ + \beta_2 exper + u $$
+
+```{r}
+model <- lm(dados$lwage ~ dados$educ + dados$exper)
+summary(model)
+```
+
+
+
+```{r}
+# O parâmetros "se" indica os erros padrões a serem utilizados
+
+stargazer(model, df = TRUE, no.space=TRUE, type="text", omit.stat=c("adj.rsq","ser"))
+# Estou omitido a Soma dos Quadrados dos Resíduos e o R2-ajustado
+# type - pode ser em 'latex' e 'html' - ele vai gerar o código
+# type ='text' - é uma maneira de visualizar enquanto você faz o código
+```
+
+Exemplo de como é exportado em latex:
+```{r}
+stargazer(model, df = TRUE, no.space=TRUE, type="latex", omit.stat=c("adj.rsq","ser"))
+```
+
+
+```{r}
+model2 <- lm(dados$lwage ~ dados$educ + dados$exper + dados$tenure)
+```
+
+
+Agora, vamos exportar ambos os modelos juntos:
+```{r}
+stargazer(model, model2, df = TRUE, no.space=TRUE, type="text", omit.stat=c("adj.rsq","ser"), title='Resultados', align = T)
+```
+
+
+## Estatísticas descritivas 
+
+Podemos querer reportar a média e o desvio padrão de algumas variáveis:
+
+```{r}
+x <- subset(dados[c("educ","exper","tenure")])
+stargazer(x,summary.stat = c("mean", "sd"), digits=2, title = "Estatística Descritiva", type = "text")
+```
+
+
+

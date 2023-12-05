@@ -1,0 +1,151 @@
+---
+title: "Arquivo de Apoio - Testes de Hipóteses, Heterocedasticidade e Exportando tabelas"
+author: "Gustavo Romero e João P. Corrêa"
+date: '2022-11-17'
+output: pdf_document
+---
+
+Em primeiro lugar, vamos importar as bibliotecas usuais vistas ao longo do curso.
+```{r}
+library(wooldridge)
+library(tidyverse)
+```
+
+## Teste de significância usual
+
+Vamos utilizar a base de dados `WAGE2`do wooldridge para esse exemplo.
+```{r}
+dados <- wooldridge::wage2
+```
+
+Considere a seguinte regressão:
+
+$$ log (wage) = \beta_0 + \beta_1 educ + \beta_2 exper + u $$
+
+```{r}
+model <- lm(dados$lwage ~ dados$educ + dados$exper)
+summary(model)
+```
+
+
+Uma outra maneira de reportar os testes de hipóteses para nossa regressão é utilizando a função *coeftest*. Para isso, é necessário instalar a bilioteca **AER** - use o seguinte comando em seu console: *install.packages("AER", dependencies = TRUE)*.
+```{r}
+library(AER)
+```
+
+```{r}
+coeftest(model)
+```
+
+
+
+## Teste F
+Seja o seguinte modelo de regressão:
+
+$$ log(wage) = \beta_0 + \beta_1 educ + \beta_2 exper + \beta_3 tenure + \beta_4 age + u $$
+```{r}
+model2 <- lm(data=dados, lwage ~ educ + exper + tenure + age)
+
+summary(model2)
+```
+
+Note que a estatística F encontrada foi **43.62**.
+
+
+Uma maneira de realizar o teste conjunto F é utilizando a função **linearHypothesis**. 
+
+O primeiro argumento inserimos o modelo irrestrito que especificamos. O segundo argumento são os argumenos que queremos testar.
+```{r}
+linearHypothesis(model2, c(" educ", "exper", "tenure", "age" ))
+```
+
+Note que encontramos a mesma estatística F. O *default* da função summary é testar todos os coeficientes conjuntamente iguais a zero. Porém, com a função **linearHypothesis** podemos escolher esses argumentos.
+```{r}
+linearHypothesis(model2, c(" educ", "exper", "tenure" ))
+```
+
+
+
+## Erro padrão Robusto a Heterocedasticidade
+
+Voltando ao modelo inicial:
+```{r}
+model <- lm(dados$lwage ~ dados$educ + dados$exper)
+```
+
+
+Há vários estimadores robustos a heterocedasticidade, como os estimadores HC0,HC1,HC2,HC3. O estimador visto em sala é o HC0, ou estimador de Eicker-White ou simplesmente estimador de White. O estimador HC1 nada mais é do que o estimador HC0 levando em consideração a perda de graus de liberdade quando se calcula os resíduos da regressão. 
+
+A justificativa para a construção do estimador de HC1 é ponderar para os graus de liberdade perdidos na estimação de $\beta$, de forma semelhante ao que fazemos para calcular a variância amostral $s^2$, em que descontamos a perda de um grau de liberdade utilizada para o cálculo da média amostral. O estimador HC1, portanto, é recomendado em relação ao estimador HC0. Perceba, porém, que quando n é grande e k é pequeno, $\frac{n}{n-k} \approx  1$ e, assim, a diferença entre os dois estimadores será bem próxima a zero. A título de curiosidade, HC1 é também o estimador mais utilizado e o padrão utilizado pelo Stata. 
+
+Veja mais detalhes [Aqui](https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf), página 4.
+
+Para encontrarmos o erro padrão robusto a heterocedasticidade, basta coloca o nosso modelo no primeiro argumeno e o colocar type igual ao tipo do estimador, em nosso caso, hc1. 
+
+```{r message=FALSE, warning=FALSE}
+# Obter a matrix de var cov
+#sqrt(hccm(model, type="hc1"))
+```
+
+Se quisermos obter apenas a erro padrão dos estimadores, podemos usar:
+```{r message=FALSE, warning=FALSE}
+#het <- matrix(0,3,1)
+#for ( i in 1:3){
+#  het[i] <- sqrt(hccm(model, type="hc1"))[i,i]
+#}
+
+
+#het
+```
+
+
+### Teste t robusto a heterocedasticidade
+
+Seja nosso modelo:
+$$ log (wage) = \beta_0 + \beta_1 educ + \beta_2 exper + u $$
+
+Se queremos realizar o teste t robusto a heterocedasticidade, basta adicionar o segundo argumento especificando qual estimador usar.
+```{r}
+coeftest(model, vcov= hccm(model, type="hc1"))
+```
+
+### Teste F
+
+Estamos testando a seguinte hipótese conjunta: $H_0: \beta_{educ} = \beta_{exper} = 0$ ou  $H_0: \beta_{1} = \beta_{2} = 0$.
+
+```{r}
+linearHypothesis(model, c("dados$educ", "dados$exper"), vcov. = hccm(model, type = "hc1")) 
+```
+
+### Tabela de Regressões
+
+Suponha que temos duas regressões e queremos reportar esses resultados em um documento. Podemos utilizar a biblioteca *jtools*. Basta inserir o comando *install.packages('jtools')* em seu console. Em seguida, importe a biblioteca:
+
+```{r}
+library(jtools)
+```
+
+1. A **primeira regressão** foi denominada anteriormente como **model**:
+$$ log (wage) = \beta_0 + \beta_1 educ + \beta_2 exper + u $$ 
+2. Suponha que temos outra regressão linear simples:
+$$ log (wage) = \beta_0 + \beta_1 educ $$
+```{r}
+mrs <- lm(dados$lwage ~ dados$educ)
+```
+
+Como reportar esses resultados? Usando a função: **export_summs**. Mais informações acesse [Aqui](https://cran.r-project.org/web/packages/jtools/vignettes/summ.html#Table_output_for_Word_and_RMarkdown_documents)
+
+
+
+```{r}
+export_summs(mrs, model, scale=TRUE )
+```
+O default da função é reportar o erro padrão em parênteses. Mas é possível reportar outras estatísticas...
+
+Por exemplo, a estatística t:
+
+```{r}
+export_summs(mrs, model, scale=TRUE, error_format = "({statistic})" )
+```
+
+
