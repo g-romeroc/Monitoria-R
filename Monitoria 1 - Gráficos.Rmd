@@ -1,0 +1,193 @@
+---
+title: "Gráficos em R"
+author: "Gustavo Romero Cardoso e João Pedro S. Corrêa"
+date: "15/03/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Sintaxe Básica:
+### Operações: 
+
+```{r}
+5+5
+```
+```{r}
+5-5
+```
+```{r}
+3^2
+```
+```{r}
+3**2
+```
+```{r}
+3/4
+```
+```{r}
+exp(10) #Exponencial
+log(1) # Log natural
+log(4, base = 10) # Log na base 10
+```
+
+
+### Variáveis:
+
+Variáveis são objetos que você nomeia para guardar os dados. Você declara uma variável usando o operador `=` ou `<-`. 
+```{r}
+x = 10
+y = 15
+
+x + y
+x * y
+10 * x
+x ^ y
+```
+
+
+### Vetores:
+
+
+Utilizamos o `c` para "agrupar" esses dados em um vetor.
+
+
+```{r}
+notas <- c(10, 9.5, 6, 8, 8.5, 5, 6, 9, 3 , 4 , 8, 7.5)
+length(notas) # O tamanho desse vetor. Quantas notas temos nesse vetor?
+summary(notas)
+```
+
+
+O default da função `sort()` é ordenar de forma crescente, mas de forma decrescente também é possível. Em seguida, qual foi a segunda maior nota?
+```{r}
+sort(notas, decreasing = TRUE )
+
+sort(notas, decreasing = TRUE )[2] # Segunda maior nota
+```
+
+```{r}
+# Notas
+q <- sort(notas, decreasing = TRUE )
+
+q[c(2,5,6)] # Queremos a segunda, quinta e sexta maiores notas
+```
+O aluno que tirou 9.5 pediu revisão da sua prova e sua "nova" nota é 9.75:
+```{r}
+# Ele tinha a segunda maior nota, então vamos atualizar as notas:
+q[2] <- 9.75
+q
+```
+
+
+### Data frame:
+
+Os vetores são um conjunto de variáveis. O Data frame, basicamente, é um conjunto de vetores. 
+
+
+```{r}
+alunos <- data.frame(
+  nomes = c("Amanda", "Bruno", "Camila", "Heitor","Rogério"),
+  idade = c(21,20,22,24,18),
+  notas = c(10, 9.5, 10, 8, 6),
+  usp = c(F,T,F,T,T)
+)
+alunos
+```
+
+```{r}
+alunos$idade
+alunos[2,3] # linha 2, coluna 3
+alunos[2, ] # Quero as informações que estão na segunda  - Todas informações do Bruno
+alunos[,3] # informações da terceira coluna
+```
+
+Uma ótima visão do banco de dados pode ser obtida com o comando `View`.
+```{r}
+View(alunos)
+names(aluos) # Nome das variáveis
+```
+
+
+### Which:
+Definimos `q` como as notas dos alunos. Agora, queremos saber quais alunos que tiraram as notas acima de 7.
+```{r}
+notas
+which(notas>7) # A resposta é a posição dos valores que foram maiores do que 7 e não os valores que são maiores que 10.  
+
+length(which(notas>7)) # Quantos alunos
+```
+
+
+### Características simples do banco de dados:
+
+Vamos utilizar um banco de dados que já "está" no R - `USArrests`. Se quiser entender melhor o banco de dados ou qualquer comando do R, utilize a função `help`
+```{r}
+help("USArrests")
+```
+
+
+```{r}
+dim(USArrests) # Dimensão do banco 
+head(USArrests) # Os seis primeiros casos
+tail(USArrests) # Os seis últimos 
+summary(USArrests) # Um sumário das variáveis
+row.names(USArrests) # Nome das linhas - nesse caso, o nome dos estados dos EUA
+```
+
+
+Carregando os pacotes e fazendo um gráfico para variáveis *quantitativas*:
+
+#### Histograma
+```{r}
+library(tidyverse)
+ggplot(data = USArrests) + geom_histogram(mapping = aes(x = Murder)) +
+  labs(x='Assaltos para cada 100 mil habitantes', y = 'Frequência', title='Assaltos em Estados Americanos', subtitle = 'Subtítulo', caption = 'Explicação do gráfico')
+
+# bins = 10 reduz o número de divisões, limitando-as em 10. Isso significa que teremos dez barras em nosso histograma
+```
+
+#### Gráfico de barras para variáveis *qualitativas*:
+
+Vamos utilizar outra base de dados: `PErisk`. Temos uma variável `courts` que vale 1 quando o país tem um judiciário independente e 0 se o país não tem o judiciário independente.  
+
+```{r}
+library(Zelig)
+ggplot(data = PErisk) +
+ geom_bar(mapping = aes(x = courts))
+```
+
+
+
+
+#### Quanti - Quanti : o diagrama de dispersão 
+
+```{r}
+ggplot(data = PErisk) +
+ geom_point(mapping = aes(x = barb2, y = gdpw2)) +
+ geom_smooth(mapping = aes(x = barb2, y = gdpw2), 
+ method = 'lm'
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

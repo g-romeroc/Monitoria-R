@@ -1,0 +1,180 @@
+---
+title: "Manipulação de Dados em R"
+author: "Gustavo Romero Cardoso e João Pedro S. Corrêa"
+date: '2022-08-17'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# *Parte 1* - Carregamento de Dados em R
+
+Vamos utilizar o pacote `tidyverse` que é composto de pacotes para processar dados, visualização de dados e importar/exportar dados.
+
+| Códigos     | Objetivo                          |
+|-------------|-----------------------------------|
+| **select**  | seleciona variáveis do banco      |
+| **rename**  | renomeia variáveis do banco       |
+| **filter**  | seleciona um subconjunto de casos |
+| **arrange** | ordena o banco de dados           |
+| **mutate**  | adiciona ao banco de dados uma variável transformada|
+| **transmute**  | cria novo banco de dados aplicando uma dada transformação     |
+| **group_by** | agrupa o banco de dados de acordo com uma variável, ou conjunto de variáveis dados |
+| **summarize** | calcula o sumário dos resultados da base |
+
+
+Utilize o seguinte comando no console `install.packages('tidyverse')`. 
+
+
+#### Select e Rename
+```{r}
+library(tidyverse)
+data <- USArrests
+
+sel <- select(data, Assault, UrbanPop)
+sel2 <- select(data, -c(Assault, UrbanPop)) # Todas as variáveis exceto aquelas que expecificamos 
+
+data_renomeada <- rename(data, assaltos = Assault, População = UrbanPop)
+data_renomeada
+sel2
+```
+
+#### Filter 
+
+Seleciona casos que satisfazem uma certa condição preestabelecida. Suponha que queremos os estados que tiveram menos que 200 assaltos.
+```{r}
+data_filter <- filter(data, Assault<200)
+head(data_filter)
+```
+
+Se você quiser adicionar outras condições, basta colocar os comandos em sequência (usando vírgulas para separar).
+
+
+#### Arrange
+
+A função `arrange` serve para ordenar o banco de dados, incluindo ordem alfabética e numérica. Basta selecionar uma ou mais variáveis que serão usadas para fazer o ordenamento. 
+
+```{r}
+data %>% arrange(Murder)
+```
+
+Ou inverter a ordem:
+```{r}
+data %>% arrange(desc(Murder))
+```
+
+
+#### Mutate 
+
+Algumas vezes queremos alterar os valores de colunas, multiplicando ou passando funções que são de nosso interesse.
+
+```{r}
+data %>% mutate(LogAssalto = log(Assault))
+```
+
+
+
+
+# *Parte 2* - Manipulação dos dados
+
+| Códigos     | Objetivo                          |
+|-------------|-----------------------------------|
+| **sum()**  | Soma dos valores      |
+| **mean()**  | Média        |
+| **var()**  | Variância |
+| **sd()** | Desvio Padrão    |
+| **median()**  | Mediana |
+| **summary()**  | Resumo estatístico     |
+| **group_by** | agrupa o banco de dados de acordo com uma variável, ou conjunto de variáveis dados |
+
+
+#### Group_by e Summarize
+Algumas vezes precisamos calcular as estatísticas de acordo com os grupos de valores. Quais são as média de assassinatos de acordo com o número de assalto. 
+```{r}
+data %>% group_by(Assault) %>% summarize(media = mean(Murder, na.rm=TRUE))
+```
+
+
+
+Suponha que cometemos um erro e temos um banco de dados com linhas repetidas 
+```{r}
+# Estou apenas colocando as linhas replicadas:
+data %>% sample_frac(3,replace=T) %>% arrange(Murder)
+
+```
+
+Queremos corrigir o erro e excluir essas observações repetidas
+```{r}
+data %>% sample_frac(3,replace=T) %>% arrange(Murder) %>% distinct()
+```
+
+# *Parte 3* - Agregação de bancos de dados
+
+```{r}
+
+data <- cbind(row.names(data), data)
+data <- rename(data, Estados = 'row.names(data)' )
+```
+
+
+Um problema frequente é a necessidade de combinar diversos bancos de dados em um só. 
+```{r}
+
+## Primeira parte dos dados:
+data_1 <- select(data, Estados, Murder, Assault )[1:10,]
+data_1
+
+
+#Utilizando Pipe:
+# data[1:10,] %>% select(Murder, Assault)
+
+## Segunda parte dos dados
+data_2 <- select(data, Estados, Murder, Rape)[2:11,]
+data_2
+
+```
+
+#### inner_join - junta os bancos, preservando os casos presentes em ambos os bancos 
+```{r}
+inner <- inner_join(data_1,data_2)
+inner
+```
+
+
+### left_join - agrega os dados do segundo banco ao primeiro, preservando valores que estejam incompletos no primeiro banco
+```{r}
+left <- left_join(data_1,data_2)
+left
+```
+
+
+### full_join - Agrega todos os dados, independentemente se os casos aparecem em um, e não em outro banco. Preenche com NA onde não há informação. 
+
+```{r}
+full <- full_join(data_1, data_2)
+full
+```
+
+
+Existem alguns outros comandos para juntar bancos de dados: right_join (análogo ao left_join); semi_join; anti_join. 
+
+
+# *Parte 4* - Importando bases de dados
+
+É importante instalar alguns pacotes: `tidyverse`; `haven`; `readxl`.
+
+### Lendo planilhas do Excel
+
+Basta utilizar o seguinte comando:
+`importando <- read_excel('arquivo.xlsx', sheet=1)`
+
+onde 'arquivo.xslx' é o arquivo que você quer importar que está em seu diretório. O 'sheet' é qual planilha você quer importar do seu arquivo excel. 
+
+### Csv 
+`importando <- read_csv('arquivo.csv')`
+
+
+
+
