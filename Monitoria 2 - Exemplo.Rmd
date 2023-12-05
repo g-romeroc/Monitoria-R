@@ -1,0 +1,148 @@
+---
+title: "Monitoria - Exemplo"
+author: "Gustavo Romero Cardoso e João Pedro Saldanha Corrêa"
+date: '26/08/2022'
+output: pdf_document
+---
+
+## Os dados em MEAP01 são para o estado de Michigan no ano de 2001. Use esses dados para responder às seguintes perguntas.
+
+Vamos empregar a base de dados MEAP01. Esta base contém informações do departamento de educação do estado de Michigan, EUA, sobre 1823 distritos escolares. 
+
+É necessário instalar o seguinte pacote:  `wooldridge`. Para isso, basta inserir o seguinte comando em seu console: `install.packages('wooldridge')`. Após instalar, precisamos importar utilizando `library()`.
+
+```{r}
+# Carregando pacotes
+library(wooldridge)
+library(tidyverse)
+
+# Importando os dados
+dados <- wooldridge::meap01
+```
+
+### **a)**  Encontre o maior e o menor valor de *math4*.
+```{r}
+
+# Solução 1
+summary(dados$math4)
+
+# Solução 2
+max(dados$math4)
+min(dados$math4)
+
+# Solução 3
+dados %>% summarise(máximo = max(math4), mínimo = min(math4))
+
+# Solução 4
+dados %>% distinct(math4) %>% arrange(math4)
+```
+### **b)** Quantas escolas têm uma taxa de aprovação perfeita no teste de matemática? Que porcentagem é essa da amostra total?
+
+```{r}
+
+# Solução 1
+dados %>% select(math4) %>% filter(math4==100) %>% table()
+
+# Solução 2
+length(which(dados$math4==100))
+
+# Solução 3
+table(dados$math4==100)
+
+
+# Solução 4
+table(subset(dados, math4==100, select = "math4"))
+
+
+# Solução 5
+dados %>% filter(math4==100) %>% nrow()
+
+# Solução 6
+dados %>% filter(math4 == 100) %>% tally()
+
+# Solução 7
+dados %>% group_by(math4) %>% tally() %>% arrange(-math4)
+```
+
+Porcentagem:
+```{r}
+
+# Porcentagem do total
+
+n_tot <- dados %>% tally()
+
+n_100 <- dados %>% filter(math4 == 100) %>% tally()
+
+porcent_100 <- (n_100$n/n_tot$n)*100
+
+round(porcent_100, digits = 2)
+```
+
+### **c)** Quantas escolas têm taxas de aprovação em matemática de exatamente 50%?
+```{r}
+
+# Solução 1
+table(dados$math4==50)
+
+# Solução 2
+dados %>% filter(math4 == 50) %>% tally()
+```
+
+### **d)** Compare as taxas médias de aprovação para as pontuações de matemática e leitura.
+```{r}
+
+# Solução 1
+mean(dados$math4)
+mean(dados$read4)
+
+x <- cbind(mean(dados$math4),mean(dados$read4))
+colnames(x) <- c("Math4", "read4")
+x
+
+# Solução 2
+dados %>% select(math4, read4) %>% colMeans()
+
+# Solução 3
+dados %>% summarise(matemática = mean(math4), leitura = mean(read4))
+
+```
+
+
+### **e)** Encontre a correlação entre *math4* e *read4*. O que você pode concluir?
+
+```{r}
+
+# Solução 1
+cor(dados$math4, dados$read4)
+
+# Solução 2
+dados %>% select(math4, read4) %>% cor() %>% round(2)
+
+# Solução 3
+dados %>% summarise(correlação = cor(math4, read4))
+```
+Escolas com altas taxas de aprovação em matemática possuim uma forte tendência a ter altas taxas de aprovação em leitura (vice-versa).
+
+### **f)** A variável *exppp* é o gasto por aluno. Encontre a média de *exppp* junto com seu desvio padrão. Você diria que há uma grande variação nos gastos por aluno?
+
+```{r}
+
+# Solução 1
+round(mean(dados$exppp),1)
+sd(dados$exppp)
+
+# Solução 2
+dados %>% summarise(média = mean(exppp), 'desvio-padrão' = sd(exppp))
+```
+
+
+
+
+
+
+
+
+
+
+
+
