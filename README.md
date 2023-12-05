@@ -1,6 +1,6 @@
-# Monitória de Econometria com R (Introdução)
+# Monitoria de Econometria com R (Introdução)
 
-Este repositório contém materiais didáticos e exemplos de código para a monitoria de Econometria, focando no uso do R. Cada arquivo `.Rmd` (R Markdown) aborda diferentes aspectos e técnicas de econometria, desde os conceitos básicos até testes de hipóteses e exportação de resultados.
+Este repositório contém materiais didáticos e exemplos de código para a monitoria de Econometria (EAE0324 - FEA/USP), focando no uso do R. Cada arquivo `.Rmd` (R Markdown) aborda diferentes aspectos e técnicas de econometria, desde os conceitos básicos até testes de hipóteses e exportação de resultados.
 
 ## Conteúdo do Repositório
 
