@@ -1,0 +1,389 @@
+---
+title: "Monitoria 2 - Manipulação de Dados - Tidyverse"
+author: "Gustavo Romero Cardoso e João Pedro S. Corrêa"
+date: "26/08/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Introdução
+
+Da monitoria passada, ficaram faltando os comandos for(){}, function(){} e if(){}else{}. Vamos começar por eles.
+
+Em seguida, veremos o pacote *tidyverse* e um exemplo similar ao exercício 10 da lista 1. 
+
+## Mais Comandos
+### for(){}
+
+for é uma estrutura de repetição usada para fazer loops. A estrutura do for(){} é a seguinte:
+
+for(i in 1:n){comandos}
+
+Para cada valor de i os {comandos} serão calculados. O i in 1:n nos diz que os valores de i serão i = 1 até i = n. Ou seja, na primeira vez do for o i = 1, na segunda i = 2, . . . ,i = n.
+
+Exemplo 1:
+```{r}
+for(i in 1:3){
+  print(i)
+  }
+```
+
+Exemplo 2:
+```{r}
+for(i in 1:5){
+  print(i^2)
+  }
+```
+
+Exemplo 3:
+
+Podemos definir o vetor da estrutura do loop antes de iniciarmos o loop, por exemplo:
+
+```{r}
+x <- c(1,4,6,8,10) # Defino a variável x
+
+for(i in x){
+  print(i^2)
+  }
+```
+
+Exemplo 4:
+```{r}
+for(i in x){
+  print(c(i,i^2))
+  }
+```
+
+Exemplo 5:
+
+Ao invés de usarmos a função print(), também podemos armazenar os valores encontrados em um vetor.
+
+```{r}
+vetor <- numeric() # Criando um objeto formado por números
+
+x <- 1:10
+
+for(i in x){
+  vetor [i] <- i^2
+}
+
+vetor
+```
+
+Exemplo 6:
+
+Suponha que não temos uma sequência do tipo (1,2,3,4,. . .). Note que aparece NA’s no meio do vetor. Isso ocore uma vez que ao se iniciar o looping, o i=1 vai inserir o valor de iˆ2 na primeira posição do objeto vetor. A nossa sequência é (1,4,6,8,10). Agora, note que o próximo valor de i não será i=2, mas sim i=4. Então, o valor de 4ˆ2 (i=4) será inserido na quarta posição do vetor.
+
+```{r}
+vetor <- numeric()
+
+x <- c(1,4,6,8,10)
+
+for(i in x){
+  vetor [i] <- i^2
+}
+
+vetor
+```
+
+Vamos fazer o seguinte: Vamos tomar o tamanho desse vetor x que está inserido dentro da nossa estrutura do for(). Sabemos que o vetor tem 5 elementos, então vamos rearranjar nossa estrutura. Porém, isso ainda não basta. Qual o nosso objetivo? Encontrar os valores elevados ao quadrado de x (1,4,6,8,10). Queremos um vetor de 5 elementos que contenha esse elementos ao quadrado. Ou seja, buscamos algo como (1,16,36,64,100). Mais uma mudança na estrutura é necessária. Queremos que o primeiro valor do vetor x seja elevado ao quadrado e esteja posicionado na primeira posição do vetor. O segundo valor do vetor x seja elevado ao quadrado e esteja posicionado na segunda posição do vetor.
+
+```{r}
+vetor <- numeric()
+
+x <- c(1,4,6,8,10)
+
+length(x)
+```
+
+```{r}
+for (i in 1:length(x)){
+  vetor [i] <- x[i]^2 # Aqui estamos elevando o elemento i do vetor x ao quadrado
+}
+
+vetor
+```
+
+Exemplo 7:
+
+```{r}
+#Tabuada do 5:
+
+j <- 5
+
+for (i in 1:10){
+  print(i*j)
+}
+```
+
+Exemplo 8:
+
+```{r}
+t <- c(17,19,20,25,30,35)
+
+for (temp in t){
+if (temp >24){
+print("calor")
+} else{
+print("frio")
+}
+}
+```
+
+Exemplo 9:
+
+```{r}
+for (i in 1:2){
+  for (j in 1:3){
+    print(i*j)
+  }
+}
+```
+
+O processo ocorre da seguinte forma: o primeiro valor do for i = 1. Em seguida, o R vai “rodar” para todos os valores de j, uma vez que o segundo for está inserido no primeiro. Portanto, temos que i=1 * j=1 ; i=1 * j=2; i=1 * j=3. Ao finalizar todos os possíves j’s para i=1, o processo é repetido para i=2. i=2 * j=1 ; i =2 * j=2 ; i=2 * j=3. Em outras palavras, estamos encontrando todas as “combinações” de i*j.
+
+Exemplo 10:
+
+Mas nem sempre o loop é necessário. Vamos refazer o exemplo 5 de uma maneira mais simples.
+
+```{r}
+x <- 1:10
+
+x_quadrado <- x^2
+
+x
+```
+
+Exemplo 11:
+
+O valor da x <- 0 vai ficar armazenado no “Environment” até se iniciar o loop no for (ler linha por linha - comando: Ctrl + Enter. No R, a leitura do código ocorre da direita para esquerda. Portanto, temos que para i=1: x = 0 + 1 (o R sempre lê primeiro a direita da igualdade e, como definimos a variável x=0 na primeira linha, o R vai conseguir ler o comando), ou seja, x=1. Para i=2: x = 1 + 2 = 3.Obs: Após i=1, o R “guardou” que o novo valor de x era = 1.
+
+```{r}
+x <- 0
+
+for (i in 1:2){
+  x = x + i
+  }
+
+x
+```
+
+```{r}
+x2 <- c("Ana", "Bruno", "Carlos", "Daniel")
+
+for(i in x2) {
+  print(paste("O nome", i, "tem", nchar(i), "letras."))
+}
+```
+
+### function(){} e if(){}else{}
+
+A estrutura de comandos de uma função é:
+
+Nome_da_função <- function(parâmetro1, parâmetro2, ...){
+  Comandos
+}
+
+Depois basta chamar a função e inserir os parâmetros:
+
+Nome_da_função(parâmetro1,...)
+
+Estrutura de if(){}else{}:
+
+if(condição){comandos}else{comandos}
+
+```{r}
+impar_par <- function(x){
+  if (x %% 2 == 0){
+    return("par")
+    }
+  else{
+    return("ímpar")
+  }
+}
+
+impar_par(5)
+```
+
+```{r}
+impar_par(10)
+```
+
+```{r}
+contar_pares <- function(k){
+  contando <- 0
+  for (i in k){
+    if(i %% 2 == 0){ # Se a divisão do valor de i tiver resto 0, ou seja, for par
+      contando <- contando + 1
+    }
+  }
+  print(contando)
+}
+
+contar_pares(1:21)
+```
+
+```{r}
+contar_pares(c(1:20, 30:35, 38))
+```
+
+
+
+
+# Monitoria 2
+
+# *Parte 1* - Carregar Dados em R
+
+Vamos utilizar o pacote `tidyverse` que é composto de pacotes para processar, visualizar e importar/exportar dados.
+
+| Códigos        | Objetivo                                                      |
+|----------------|---------------------------------------------------------------|
+| **select**     | seleciona variáveis do banco                                  |
+| **rename**     | renomeia variáveis do banco                                   |
+| **filter**     | seleciona um subconjunto de casos                             |
+| **arrange**    | ordena o banco de dados                                       |
+| **mutate**     | adiciona ao banco de dados uma variável transformada          |
+| **transmute**  | cria novo banco de dados aplicando uma dada transformação     |
+| **group_by**   | agrupa o banco de dados de acordo com uma variável, ou conjunto de variáveis dados |
+| **summarize**  | calcula o sumário dos resultados da base                      |
+
+
+Utilize o seguinte comando no console `install.packages('tidyverse')`. 
+
+
+#### Select e Rename
+
+```{r}
+library(tidyverse)
+data <- USArrests
+
+sel <- select(data, Assault, UrbanPop)
+sel2 <- select(data, -c(Assault, UrbanPop)) # Todas as variáveis exceto aquelas que expecificamos 
+
+data_renomeada <- rename(data, assaltos = Assault, População = UrbanPop)
+data_renomeada
+sel2
+
+#data %>% select(Murder, Rape)
+#data %>% select(Assault, UrbanPop) %>% rename(assaltos = Assault, População = UrbanPop)
+```
+
+#### Filter 
+
+Seleciona casos que satisfazem uma certa condição preestabelecida. Suponha que queremos os estados que tiveram menos que 200 assaltos.
+```{r}
+data_filter <- filter(data, Assault<200)
+head(data_filter)
+
+#data %>% filter(Assault < 200)
+```
+
+Se você quiser adicionar outras condições, basta colocar os comandos em sequência (usando vírgulas para separar).
+
+
+#### Arrange
+
+A função `arrange` serve para ordenar o banco de dados, incluindo ordem alfabética e numérica. Basta selecionar uma ou mais variáveis que serão usadas para fazer o ordenamento. 
+
+```{r}
+data %>% arrange(Murder)
+```
+
+Ou inverter a ordem:
+```{r}
+data %>% arrange(desc(Murder)) # Ou data %>% arrange(-Murder)
+```
+
+
+#### Mutate 
+
+Algumas vezes queremos alterar os valores de colunas, multiplicando ou passando funções que são de nosso interesse.
+
+```{r}
+data %>% mutate(LogAssalto = log(Assault))
+```
+
+# *Parte 2* - Manipulação dos dados
+
+| Códigos      | Objetivo                          |
+|--------------|-----------------------------------|
+| **sum()**    | Soma dos valores                  |
+| **mean()**   | Média                             |
+| **var()**    | Variância                         |
+| **sd()**     | Desvio Padrão                     |
+| **median()** | Mediana                           |
+| **summary()**| Resumo estatístico                |
+| **group_by** | agrupa o banco de dados de acordo com uma variável, ou conjunto de variáveis dados |
+
+
+#### Group_by e Summarize
+
+Algumas vezes precisamos calcular as estatísticas de acordo com os grupos de valores. Quais são as médias de assassinatos de acordo com o número de assaltos. 
+```{r}
+data %>% group_by(Assault) %>% summarize(media = mean(Murder, na.rm=TRUE))
+
+# data %>% group_by(UrbanPop) %>% summarize(media = mean(Murder, na.rm=TRUE)) %>% arrange(UrbanPop)
+```
+
+Suponha que cometemos um erro e temos um banco de dados com linhas repetidas 
+```{r}
+# Estou apenas colocando as linhas replicadas:
+data %>% sample_frac(3,replace=T) %>% arrange(Murder)
+
+```
+
+Queremos corrigir o erro e excluir essas observações repetidas
+```{r}
+data %>% sample_frac(3,replace=T) %>% arrange(Murder) %>% distinct()
+```
+
+# *Parte 3* - Histogramas
+
+Vamos construir um histograma para a variável Assault, o número de prisões por assalto a cada 100.000 habitantes.
+
+```{r}
+data %>% ggplot() + 
+  geom_histogram(aes(x = Assault),
+                 binwidth = 20,
+                 color = "blue",
+                 fill = "blue",
+                 alpha = 0.6) +
+  labs(x='Assaltos para cada 100 mil habitantes',
+       y = 'Frequência',
+       title='Assaltos em Estados Americanos',
+       subtitle = 'Subtítulo',
+       caption = 'Explicação do gráfico')
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
