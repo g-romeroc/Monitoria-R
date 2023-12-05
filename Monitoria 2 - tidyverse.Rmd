@@ -9,11 +9,8 @@ output:
 
 # Introdução
 
-Da monitoria passada, ficaram faltando os comandos for(){}, function(){} e if(){}else{}. Vamos começar por eles.
+Introdução e exemplos aos comandos: for(){}, function(){} e if(){}else{}. 
 
-Em seguida, veremos o pacote *tidyverse* e um exemplo similar ao exercício 10 da lista 1. 
-
-## Mais Comandos
 ### for(){}
 
 for é uma estrutura de repetição usada para fazer loops. A estrutura do for(){} é a seguinte:
@@ -227,141 +224,6 @@ contar_pares(1:21)
 ```{r}
 contar_pares(c(1:20, 30:35, 38))
 ```
-
-
-
-
-# Monitoria 2
-
-# *Parte 1* - Carregar Dados em R
-
-Vamos utilizar o pacote `tidyverse` que é composto de pacotes para processar, visualizar e importar/exportar dados.
-
-| Códigos        | Objetivo                                                      |
-|----------------|---------------------------------------------------------------|
-| **select**     | seleciona variáveis do banco                                  |
-| **rename**     | renomeia variáveis do banco                                   |
-| **filter**     | seleciona um subconjunto de casos                             |
-| **arrange**    | ordena o banco de dados                                       |
-| **mutate**     | adiciona ao banco de dados uma variável transformada          |
-| **transmute**  | cria novo banco de dados aplicando uma dada transformação     |
-| **group_by**   | agrupa o banco de dados de acordo com uma variável, ou conjunto de variáveis dados |
-| **summarize**  | calcula o sumário dos resultados da base                      |
-
-
-Utilize o seguinte comando no console `install.packages('tidyverse')`. 
-
-
-#### Select e Rename
-
-```{r}
-library(tidyverse)
-data <- USArrests
-
-sel <- select(data, Assault, UrbanPop)
-sel2 <- select(data, -c(Assault, UrbanPop)) # Todas as variáveis exceto aquelas que expecificamos 
-
-data_renomeada <- rename(data, assaltos = Assault, População = UrbanPop)
-data_renomeada
-sel2
-
-#data %>% select(Murder, Rape)
-#data %>% select(Assault, UrbanPop) %>% rename(assaltos = Assault, População = UrbanPop)
-```
-
-#### Filter 
-
-Seleciona casos que satisfazem uma certa condição preestabelecida. Suponha que queremos os estados que tiveram menos que 200 assaltos.
-```{r}
-data_filter <- filter(data, Assault<200)
-head(data_filter)
-
-#data %>% filter(Assault < 200)
-```
-
-Se você quiser adicionar outras condições, basta colocar os comandos em sequência (usando vírgulas para separar).
-
-
-#### Arrange
-
-A função `arrange` serve para ordenar o banco de dados, incluindo ordem alfabética e numérica. Basta selecionar uma ou mais variáveis que serão usadas para fazer o ordenamento. 
-
-```{r}
-data %>% arrange(Murder)
-```
-
-Ou inverter a ordem:
-```{r}
-data %>% arrange(desc(Murder)) # Ou data %>% arrange(-Murder)
-```
-
-
-#### Mutate 
-
-Algumas vezes queremos alterar os valores de colunas, multiplicando ou passando funções que são de nosso interesse.
-
-```{r}
-data %>% mutate(LogAssalto = log(Assault))
-```
-
-# *Parte 2* - Manipulação dos dados
-
-| Códigos      | Objetivo                          |
-|--------------|-----------------------------------|
-| **sum()**    | Soma dos valores                  |
-| **mean()**   | Média                             |
-| **var()**    | Variância                         |
-| **sd()**     | Desvio Padrão                     |
-| **median()** | Mediana                           |
-| **summary()**| Resumo estatístico                |
-| **group_by** | agrupa o banco de dados de acordo com uma variável, ou conjunto de variáveis dados |
-
-
-#### Group_by e Summarize
-
-Algumas vezes precisamos calcular as estatísticas de acordo com os grupos de valores. Quais são as médias de assassinatos de acordo com o número de assaltos. 
-```{r}
-data %>% group_by(Assault) %>% summarize(media = mean(Murder, na.rm=TRUE))
-
-# data %>% group_by(UrbanPop) %>% summarize(media = mean(Murder, na.rm=TRUE)) %>% arrange(UrbanPop)
-```
-
-Suponha que cometemos um erro e temos um banco de dados com linhas repetidas 
-```{r}
-# Estou apenas colocando as linhas replicadas:
-data %>% sample_frac(3,replace=T) %>% arrange(Murder)
-
-```
-
-Queremos corrigir o erro e excluir essas observações repetidas
-```{r}
-data %>% sample_frac(3,replace=T) %>% arrange(Murder) %>% distinct()
-```
-
-# *Parte 3* - Histogramas
-
-Vamos construir um histograma para a variável Assault, o número de prisões por assalto a cada 100.000 habitantes.
-
-```{r}
-data %>% ggplot() + 
-  geom_histogram(aes(x = Assault),
-                 binwidth = 20,
-                 color = "blue",
-                 fill = "blue",
-                 alpha = 0.6) +
-  labs(x='Assaltos para cada 100 mil habitantes',
-       y = 'Frequência',
-       title='Assaltos em Estados Americanos',
-       subtitle = 'Subtítulo',
-       caption = 'Explicação do gráfico')
-```
-
-
-
-
-
-
-
 
 
 
